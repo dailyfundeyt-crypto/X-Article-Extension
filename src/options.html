@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="options.css" />
+    <title>X to Obsidian – Einstellungen</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <span class="logo">◈</span>
+        <div>
+          <h1>X to Obsidian</h1>
+          <p class="sub">Einstellungen</p>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Speicherort</h2>
+        <label>
+          <span class="lbl">Basisordner (im Download-Verzeichnis)</span>
+          <input type="text" id="baseFolder" placeholder="X to Obsidian" />
+          <small>
+            Jeder Beitrag wird als eigener Unterordner darin gespeichert. Diesen
+            Ordner kopierst du anschließend in deinen Obsidian-Vault.
+          </small>
+        </label>
+
+        <label>
+          <span class="lbl">Bilder-Unterordner</span>
+          <input type="text" id="imagesSubfolder" placeholder="Bilder" />
+          <small>Name des Unterordners, in dem die Fotos abgelegt werden.</small>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Markdown</h2>
+        <label>
+          <span class="lbl">Bild-Einbettung</span>
+          <select id="embedStyle">
+            <option value="wikilink">Obsidian-Wikilink &nbsp;![[bild.jpg]]&nbsp; (empfohlen)</option>
+            <option value="markdown">Markdown relativ &nbsp;![](Bilder/bild.jpg)</option>
+          </select>
+          <small>
+            Wikilinks funktionieren auch dann, wenn der Ordner irgendwo in den
+            Vault kopiert wird (Auflösung über den Dateinamen).
+          </small>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="includeFrontmatter" />
+          <span>YAML-Frontmatter (Autor, Quelle, Datum, Tags) einfügen</span>
+        </label>
+
+        <label>
+          <span class="lbl">Tag</span>
+          <input type="text" id="addTag" placeholder="x" />
+          <small>Wird im Frontmatter als Tag gesetzt. Leer lassen für keinen Tag.</small>
+        </label>
+      </section>
+
+      <div class="actions">
+        <button id="save" class="btn primary">Speichern</button>
+        <span id="saved" class="saved" hidden>Gespeichert ✓</span>
+      </div>
+
+      <section class="card preview">
+        <h2>So sieht der Ordner aus</h2>
+        <pre>📁 <span id="pvBase">X to Obsidian</span>/
+   📁 elonmusk - 2026-06-09 - Mein Beitrag/
+      📄 elonmusk - 2026-06-09 - Mein Beitrag.md
+      📁 <span id="pvImg">Bilder</span>/
+         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 01.jpg
+         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 02.jpg</pre>
+      </section>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

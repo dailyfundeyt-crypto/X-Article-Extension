@@ -1,0 +1,79 @@
+.x2obs-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.x2obs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 2px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: rgb(113, 118, 123);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.x2obs-btn:hover {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.x2obs-btn:active {
+  transform: scale(0.9);
+}
+
+.x2obs-btn.x2obs-done {
+  color: #16a34a;
+}
+
+.x2obs-btn.x2obs-loading {
+  pointer-events: none;
+  opacity: 0.6;
+  animation: x2obs-pulse 0.8s ease-in-out infinite;
+}
+
+.x2obs-btn.x2obs-floating {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  z-index: 5;
+}
+
+@keyframes x2obs-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+#x2obs-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  max-width: 80vw;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 999999;
+}
+
+#x2obs-toast.x2obs-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#x2obs-toast.x2obs-ok { background: #16a34a; }
+#x2obs-toast.x2obs-err { background: #dc2626; }
