@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>X to Obsidian</title>
+  </head>
+  <body>
+    <header class="head">
+      <span class="logo">◈</span>
+      <h1>X&nbsp;to&nbsp;Obsidian</h1>
+    </header>
+
+    <main>
+      <p class="hint">
+        Klicke unter einem Beitrag auf das <span class="logo-inline">◈</span>-Symbol
+        oder speichere hier den aktuell geöffneten Beitrag.
+      </p>
+
+      <button id="saveCurrent" class="btn primary">Aktuellen Beitrag speichern</button>
+      <div id="status" class="status" hidden></div>
+
+      <section class="info">
+        <div class="row">
+          <span class="label">Zielordner</span>
+          <span id="folderInfo" class="value">…</span>
+        </div>
+        <div class="row">
+          <span class="label">Bilder-Unterordner</span>
+          <span id="imgInfo" class="value">…</span>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <button id="openOptions" class="btn link">Einstellungen öffnen</button>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
