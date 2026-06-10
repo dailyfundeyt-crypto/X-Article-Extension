@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "X to Obsidian",
+  "name": "XCapture – X to Obsidian",
   "version": "1.0.0",
   "description": "Kopiert einen Beitrag/Artikel von X (Twitter) inklusive aller Fotos als fertiges Obsidian-Paket (Markdown + Bilder-Ordner).",
   "icons": {
@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "X to Obsidian",
+    "default_title": "XCapture",
     "default_popup": "src/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

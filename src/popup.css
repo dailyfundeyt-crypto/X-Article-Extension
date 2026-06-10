@@ -18,6 +18,29 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Brand-Zeile wie auf der Landing Page */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 2px 0;
+}
+.brand img { border-radius: 5px; }
+.brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.badge {
+  margin-left: auto;
+  padding: 2px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 980px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #98989d;
+}
+
 /* Render-Feld mit Logo */
 .hero {
   border-radius: 18px;
@@ -60,11 +83,21 @@ body {
 .btn.save:hover { background: #ffffff; }
 .btn.save:disabled { opacity: 0.5; cursor: default; }
 
+/* Ghost-Button wie der „View on GitHub"-Knopf der Landing Page */
 .btn.settings {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
   color: #f5f5f7;
+  border-color: rgba(255, 255, 255, 0.16);
 }
-.btn.settings:hover { background: rgba(255, 255, 255, 0.15); }
+.btn.settings:hover { background: rgba(255, 255, 255, 0.1); }
+
+.fine {
+  text-align: center;
+  font-size: 10.5px;
+  color: #6e6e73;
+  letter-spacing: -0.005em;
+  padding-bottom: 2px;
+}
 
 .status {
   font-size: 12px;
