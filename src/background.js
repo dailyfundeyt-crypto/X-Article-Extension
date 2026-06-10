@@ -18,13 +18,34 @@ const DEFAULTS = {
   embedStyle: "wikilink", // "wikilink" | "markdown"
   includeFrontmatter: true,
   addTag: "x",
+  aiEnabled: false,
+  aiProvider: "openai", // "openai" | "perplexity" | "openrouter"
+  aiModel: "",
+};
+
+// OpenAI-kompatible Chat-Completions-Endpunkte
+const AI_PROVIDERS = {
+  openai: {
+    url: "https://api.openai.com/v1/chat/completions",
+    defaultModel: "gpt-4o-mini",
+  },
+  perplexity: {
+    url: "https://api.perplexity.ai/chat/completions",
+    defaultModel: "sonar",
+  },
+  openrouter: {
+    url: "https://openrouter.ai/api/v1/chat/completions",
+    defaultModel: "openai/gpt-4o-mini",
+  },
 };
 
 /* ----------------------------------------------------------- Einstellungen */
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get(DEFAULTS);
-  return { ...DEFAULTS, ...stored };
+  // API-Schlüssel bewusst nur lokal (nicht synchronisiert)
+  const local = await chrome.storage.local.get({ aiApiKey: "" });
+  return { ...DEFAULTS, ...stored, ...local };
 }
 
 /* ------------------------------------------------------------------- Utils */
@@ -258,6 +279,77 @@ function buildMarkdown(tweet, settings, imageFiles) {
   return lines.join("\n");
 }
 
+/* ------------------------------------------------------------- AI / Comet */
+
+async function generateActionList(tweet, settings) {
+  const provider = AI_PROVIDERS[settings.aiProvider] || AI_PROVIDERS.openai;
+  const model = (settings.aiModel || "").trim() || provider.defaultModel;
+
+  const system =
+    "Du bist ein präziser Produktivitäts-Assistent. Der Nutzer hat gerade einen " +
+    "Beitrag auf X (Twitter) gelesen und gespeichert. Erstelle eine kurze, " +
+    "nummerierte Aktionsliste (3 bis 7 Punkte) mit konkreten nächsten Schritten, " +
+    "die ein KI-Browser-Assistent (Comet) direkt ausführen kann – z. B. Themen " +
+    "recherchieren, Quellen prüfen, Seiten öffnen, vergleichen, zusammenfassen, " +
+    "Entwürfe schreiben. Formuliere jeden Punkt als klare Anweisung. Antworte " +
+    "ausschließlich mit der nummerierten Liste auf Deutsch, ohne Einleitung.";
+
+  const user =
+    `Autor: ${[tweet.authorName, tweet.authorHandle].filter(Boolean).join(" ")}\n` +
+    `Quelle: ${tweet.url || "-"}\n\n` +
+    `Beitrag:\n${(tweet.text || "").slice(0, 4000)}`;
+
+  const res = await fetch(provider.url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${settings.aiApiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      temperature: 0.4,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`AI-API ${res.status}: ${body.slice(0, 140)}`);
+  }
+  const data = await res.json();
+  const text =
+    data && data.choices && data.choices[0] && data.choices[0].message
+      ? (data.choices[0].message.content || "").trim()
+      : "";
+  if (!text) throw new Error("Leere Antwort der AI-API");
+  return text;
+}
+
+function buildCometPrompt(tweet, actionList) {
+  const author = [tweet.authorName, tweet.authorHandle].filter(Boolean).join(" ");
+  return [
+    "Du bist der Assistent im Comet-Browser.",
+    "",
+    "Bevor du beginnst: Sage mir in 2–3 Sätzen kurz, was du gleich tun wirst",
+    "und was ich selbst übernehmen muss. Arbeite danach die folgende",
+    "Aktionsliste Schritt für Schritt ab und melde dich nach jedem Schritt kurz.",
+    "",
+    "## Aktionsliste",
+    actionList,
+    "",
+    "## Kontext (gespeicherter X-Beitrag)",
+    author ? `Autor: ${author}` : null,
+    tweet.url ? `Quelle: ${tweet.url}` : null,
+    "",
+    "Beitrag:",
+    (tweet.text || "").slice(0, 4000),
+  ]
+    .filter((l) => l !== null)
+    .join("\n");
+}
+
 /* ------------------------------------------------------------------ Save */
 
 async function saveTweet(tweet) {
@@ -307,7 +399,27 @@ async function saveTweet(tweet) {
     message += ` (${imageFiles.length} Bild${imageFiles.length === 1 ? "" : "er"})`;
   }
   if (failed) message += ` – ${failed} Bild(er) fehlgeschlagen`;
-  return { ok: true, message, zip: `${base}/${folderName}.zip`, images: imageFiles.length, failed };
+
+  // 4) Optional: AI-Aktionsliste erzeugen und als Comet-Prompt mitliefern
+  let cometPrompt = null;
+  if (settings.aiEnabled && settings.aiApiKey) {
+    try {
+      const list = await generateActionList(tweet, settings);
+      cometPrompt = buildCometPrompt(tweet, list);
+    } catch (e) {
+      console.warn("AI-Aktionsliste fehlgeschlagen:", e);
+      message += ` – AI-Liste fehlgeschlagen (${e.message || e})`;
+    }
+  }
+
+  return {
+    ok: true,
+    message,
+    zip: `${base}/${folderName}.zip`,
+    images: imageFiles.length,
+    failed,
+    cometPrompt,
+  };
 }
 
 /* --------------------------------------------------------------- Messaging */

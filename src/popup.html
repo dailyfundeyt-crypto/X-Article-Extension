@@ -6,6 +6,55 @@
     <title>X to Obsidian</title>
   </head>
   <body>
+    <!-- Render-Feld: Logo mit Hintergrund (Liquid Glass) -->
+    <div class="hero">
+      <svg viewBox="0 0 240 150" aria-hidden="true">
+        <defs>
+          <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse">
+            <path d="M26 0H0v26" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          </pattern>
+          <radialGradient id="glow" cx="50%" cy="46%" r="60%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.10)"/>
+            <stop offset="55%" stop-color="rgba(255,255,255,0.03)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <linearGradient id="f1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2e2e33"/>
+            <stop offset="100%" stop-color="#1c1c20"/>
+          </linearGradient>
+          <linearGradient id="f2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#222226"/>
+            <stop offset="100%" stop-color="#121215"/>
+          </linearGradient>
+          <linearGradient id="f3" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#28282d"/>
+            <stop offset="100%" stop-color="#17171a"/>
+          </linearGradient>
+        </defs>
+
+        <rect width="240" height="150" fill="#0a0a0c"/>
+        <rect width="240" height="150" fill="url(#grid)"/>
+        <rect width="240" height="150" fill="url(#glow)"/>
+
+        <!-- Wireframe-Akzent rechts -->
+        <g stroke="rgba(255,255,255,0.07)" fill="none" stroke-width="1">
+          <path d="M192 38l26 14v30l-26 16-26-16V52z"/>
+          <path d="M192 38v60M166 52l52 30M218 52l-52 30"/>
+        </g>
+
+        <!-- Facettierter Stein -->
+        <g transform="translate(120 76)">
+          <polygon points="0,-44 26,-22 33,-2 -32,-26" fill="url(#f1)"/>
+          <polygon points="33,-2 14,34 1,0 -32,-26" fill="url(#f3)" transform="translate(0 0)"/>
+          <polygon points="-32,-26 1,0 14,34 -10,36 -34,6" fill="url(#f2)"/>
+          <path d="M0,-44 26,-22 33,-2 14,34 -10,36 -34,6 -32,-26z"
+                fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="1"/>
+          <path d="M0,-44 -32,-26M33,-2 1,0 -32,-26M1,0 14,34"
+                fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        </g>
+      </svg>
+    </div>
+
     <button id="saveCurrent" class="btn save">
       <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
         <path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/>

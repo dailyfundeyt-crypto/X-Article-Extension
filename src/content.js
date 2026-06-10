@@ -111,6 +111,64 @@
     };
   }
 
+  /* ---------------------------------------------------------- Clipboard */
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;top:-100px;left:-100px;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        ta.remove();
+        return ok;
+      } catch (e2) {
+        return false;
+      }
+    }
+  }
+
+  // Fallback: Glas-Overlay mit Kopieren-Knopf (frische Nutzer-Geste)
+  function showCometOverlay(prompt) {
+    document.getElementById("x2obs-overlay")?.remove();
+    const overlay = document.createElement("div");
+    overlay.id = "x2obs-overlay";
+    overlay.innerHTML =
+      '<div class="x2obs-sheet" role="dialog" aria-label="Comet-Prompt">' +
+      '<div class="x2obs-sheet-head">Comet-Prompt</div>' +
+      '<textarea class="x2obs-sheet-text" readonly></textarea>' +
+      '<div class="x2obs-sheet-actions">' +
+      '<button type="button" class="x2obs-sheet-btn x2obs-primary">Kopieren</button>' +
+      '<button type="button" class="x2obs-sheet-btn">Schließen</button>' +
+      "</div></div>";
+    overlay.querySelector(".x2obs-sheet-text").value = prompt;
+    const [copyBtn, closeBtn] = overlay.querySelectorAll(".x2obs-sheet-btn");
+    copyBtn.addEventListener("click", async () => {
+      if (await copyText(prompt)) {
+        copyBtn.textContent = "Kopiert ✓";
+        setTimeout(() => overlay.remove(), 800);
+      }
+    });
+    closeBtn.addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+  }
+
+  async function handleCometPrompt(prompt) {
+    if (await copyText(prompt)) {
+      showToast("Comet-Prompt kopiert – einfach in Comet einfügen ✓", true);
+    } else {
+      showCometOverlay(prompt);
+    }
+  }
+
   /* ---------------------------------------------------------------- UI */
 
   function showToast(message, ok = true) {
@@ -144,6 +202,9 @@
         if (res && res.ok) {
           btn.classList.add("x2obs-done");
           showToast(res.message || "In Obsidian gespeichert ✓", true);
+          if (res.cometPrompt) {
+            setTimeout(() => handleCometPrompt(res.cometPrompt), 600);
+          }
         } else {
           showToast((res && res.message) || "Fehler beim Speichern", false);
         }

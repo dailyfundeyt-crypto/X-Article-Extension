@@ -71,6 +71,25 @@ Rechtsklick auf das Symbol → **Optionen**, oder im Popup auf
 | **Bild-Einbettung**   | Obsidian-Wikilink `![[…]]` (empfohlen) oder relativer Markdown-Link.|
 | **Frontmatter**       | YAML-Kopf mit Autor, Quelle, Datum und Tag ein-/ausschalten.       |
 | **Tag**               | Tag, der im Frontmatter gesetzt wird.                              |
+| **KI & Comet**        | Aktionsliste nach dem Speichern erstellen und als Comet-Prompt kopieren. |
+| **Anbieter / Modell** | OpenAI, Perplexity oder OpenRouter; Modell frei wählbar.           |
+| **API-Schlüssel**     | Wird nur lokal gespeichert, nie synchronisiert.                    |
+
+## KI-Aktionsliste für den Comet-Browser (optional)
+
+Wenn aktiviert, passiert nach jedem Speichern automatisch Folgendes:
+
+1. Eine KI (OpenAI, Perplexity oder OpenRouter – dein API-Schlüssel) erstellt
+   aus dem Artikel eine **nummerierte Aktionsliste** mit konkreten nächsten
+   Schritten.
+2. Daraus baut die Erweiterung einen **fertigen Comet-Prompt** und kopiert ihn
+   **automatisch in die Zwischenablage**.
+3. Du fügst den Prompt einfach in den Comet-Browser ein. Der Prompt weist
+   Comet an, **zuerst kurz zu sagen, was es tun wird und was du selbst
+   übernehmen musst**, und danach die Liste Schritt für Schritt abzuarbeiten.
+
+Falls das automatische Kopieren blockiert wird, zeigt die Erweiterung ein
+kleines Glas-Overlay mit dem Prompt und einem Kopieren-Knopf.
 
 ## Hinweise
 

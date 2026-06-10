@@ -60,6 +60,42 @@
         </label>
       </section>
 
+      <section class="card">
+        <h2>KI &amp; Comet</h2>
+        <label class="check">
+          <input type="checkbox" id="aiEnabled" />
+          <span>Nach dem Speichern eine Aktionsliste erstellen und als Comet-Prompt kopieren</span>
+        </label>
+        <small class="block-note">
+          Eine KI erstellt aus dem Artikel eine Liste mit nächsten Schritten.
+          Daraus wird ein fertiger Prompt für den Comet-Browser gebaut und
+          automatisch in die Zwischenablage kopiert – du fügst ihn nur noch in
+          Comet ein. Comet sagt dir zuerst kurz, was es tun wird und was du
+          selbst übernehmen musst.
+        </small>
+
+        <label>
+          <span class="lbl">Anbieter</span>
+          <select id="aiProvider">
+            <option value="openai">OpenAI</option>
+            <option value="perplexity">Perplexity</option>
+            <option value="openrouter">OpenRouter</option>
+          </select>
+        </label>
+
+        <label>
+          <span class="lbl">Modell</span>
+          <input type="text" id="aiModel" placeholder="Standard: gpt-4o-mini / sonar" />
+          <small>Leer lassen für das Standardmodell des Anbieters.</small>
+        </label>
+
+        <label>
+          <span class="lbl">API-Schlüssel</span>
+          <input type="password" id="aiApiKey" placeholder="sk-…" autocomplete="off" />
+          <small>Wird nur lokal in diesem Browser gespeichert, nie synchronisiert.</small>
+        </label>
+      </section>
+
       <div class="actions">
         <button id="save" class="btn primary">Speichern</button>
         <span id="saved" class="saved" hidden>Gespeichert ✓</span>

@@ -29,13 +29,17 @@
     "downloads",
     "activeTab",
     "scripting",
-    "notifications"
+    "notifications",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",
     "https://pbs.twimg.com/*",
-    "https://*.twimg.com/*"
+    "https://*.twimg.com/*",
+    "https://api.openai.com/*",
+    "https://api.perplexity.ai/*",
+    "https://openrouter.ai/*"
   ],
   "content_scripts": [
     {

@@ -35,8 +35,18 @@ async function saveCurrent() {
     setStatus("Speichere…", true);
     const res = await chrome.runtime.sendMessage({ type: "SAVE_TWEET", tweet: extract.tweet });
     if (res && res.ok) {
-      setStatus("Gespeichert ✓", true);
-      setTimeout(() => window.close(), 1200);
+      if (res.cometPrompt) {
+        try {
+          await navigator.clipboard.writeText(res.cometPrompt);
+          setStatus("Gespeichert ✓ Comet-Prompt kopiert – in Comet einfügen.", true);
+        } catch (e) {
+          setStatus("Gespeichert ✓ (Prompt-Kopieren fehlgeschlagen)", true);
+        }
+        setTimeout(() => window.close(), 2200);
+      } else {
+        setStatus("Gespeichert ✓", true);
+        setTimeout(() => window.close(), 1200);
+      }
     } else {
       setStatus((res && res.message) || "Fehler beim Speichern.", false);
     }
