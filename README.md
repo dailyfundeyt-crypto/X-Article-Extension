@@ -1,5 +1,9 @@
 # X to Obsidian
 
+**Landing Page / Download:** Die Projektseite liegt unter [`docs/`](docs/) und
+kann über GitHub Pages gehostet werden (Repo-Einstellungen → Pages → Branch
+`main`, Ordner `/docs`). Dort gibt es einen Download-Button für die Extension.
+
 Eine Chrome-Erweiterung, mit der du einen Beitrag/Artikel auf **X (Twitter)**
 inklusive **aller Fotos** mit einem Klick als fertiges **Obsidian-Paket**
 herunterlädst. Du bekommst einen Ordner mit der Markdown-Datei und einem
@@ -37,8 +41,9 @@ mit Autor, Quelle, Datum und Tag.
 ## Benutzung
 
 **Variante A – direkt am Beitrag:**
-Unter jedem Beitrag erscheint neben den Aktionssymbolen ein
-◈-Button. Ein Klick darauf lädt den Beitrag samt Fotos herunter.
+Unter jedem Beitrag erscheint in der Aktionsleiste – direkt neben dem
+Lesezeichen-(Save-)Button – ein Download-Button im nativen X-Design.
+Ein Klick darauf lädt den Beitrag samt Fotos herunter.
 
 **Variante B – über das Popup:**
 Öffne einen Beitrag (Status-Seite), klicke auf das Erweiterungssymbol und dann

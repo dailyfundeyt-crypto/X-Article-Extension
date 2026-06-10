@@ -158,10 +158,10 @@
   }
 
   function obsidianIcon() {
-    // Kleines Obsidian-artiges Diamant-Icon (SVG)
+    // Download-Icon im nativen X-Stil (Gegenstück zum Teilen-Icon von X)
     return (
-      '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
-      '<path fill="currentColor" d="M12 2.2 4.6 8.4 8 21.8h8l3.4-13.4L12 2.2zm0 2.6 5.1 4.3-2.1 8.2H9L6.9 9.1 12 4.8z"/>' +
+      '<svg viewBox="0 0 24 24" width="18.75" height="18.75" aria-hidden="true">' +
+      '<g><path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></g>' +
       "</svg>"
     );
   }
@@ -176,8 +176,27 @@
     if (actionBar) {
       const wrapper = document.createElement("div");
       wrapper.className = "x2obs-wrap";
-      wrapper.appendChild(btn);
-      actionBar.appendChild(wrapper);
+      const inner = document.createElement("div");
+      inner.className = "x2obs-inner";
+      inner.appendChild(btn);
+      wrapper.appendChild(inner);
+
+      // Direkt neben dem Lesezeichen-(Save-)Button einfügen
+      const bookmark = actionBar.querySelector(
+        '[data-testid="bookmark"], [data-testid="removeBookmark"]'
+      );
+      let anchor = null;
+      if (bookmark) {
+        anchor = bookmark;
+        while (anchor.parentElement && anchor.parentElement !== actionBar) {
+          anchor = anchor.parentElement;
+        }
+      }
+      if (anchor && anchor.parentElement === actionBar) {
+        actionBar.insertBefore(wrapper, anchor.nextSibling);
+      } else {
+        actionBar.appendChild(wrapper);
+      }
     } else {
       // Fallback: oben rechts im Artikel
       btn.classList.add("x2obs-floating");

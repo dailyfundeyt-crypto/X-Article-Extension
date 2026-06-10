@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X to Obsidian – Beiträge von X mit allen Fotos in Obsidian speichern</title>
+  <meta name="description" content="Chrome-Erweiterung: Speichere Beiträge und Artikel von X (Twitter) inklusive aller Fotos mit einem Klick als fertiges Obsidian-Paket." />
+  <link rel="icon" type="image/png" href="icon128.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#">
+        <img src="icon128.png" alt="" width="28" height="28" />
+        <span>X to Obsidian</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Funktionen</a>
+        <a href="#install">Installation</a>
+        <a href="https://github.com/dailyfundeyt-crypto/X-Article-Extension" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <img class="hero-icon" src="icon128.png" alt="X to Obsidian Logo" width="88" height="88" />
+    <h1>Von <span class="x-mark">𝕏</span> direkt in dein <span class="grad">Obsidian</span></h1>
+    <p class="sub">
+      Speichere jeden Beitrag oder Artikel auf X – inklusive <strong>aller Fotos</strong> –
+      mit einem Klick als fertiges Obsidian-Paket: Markdown-Notiz + Bilder-Ordner,
+      bereit zum Hineinkopieren in deinen Vault.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/dailyfundeyt-crypto/X-Article-Extension/archive/refs/heads/main.zip" download>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+        Extension herunterladen (.zip)
+      </a>
+      <a class="btn ghost" href="#install">Installationsanleitung</a>
+    </div>
+    <p class="hint">Kostenlos · Open Source · Kein Obsidian-Plugin nötig</p>
+  </header>
+
+  <main>
+    <!-- Demo: nachgebaute X-Aktionsleiste -->
+    <section class="demo">
+      <div class="tweet-card">
+        <div class="tweet-head">
+          <div class="avatar" aria-hidden="true"></div>
+          <div>
+            <div class="t-name">Obsidian Masterclass <span class="verified">✔</span></div>
+            <div class="t-handle">@second_brain</div>
+          </div>
+        </div>
+        <p class="t-text">Most people download Obsidian and spend the first week excited. The second week confused. 🧠✨</p>
+        <div class="t-media" aria-hidden="true">
+          <span>🖼️</span><span>🖼️</span>
+        </div>
+        <div class="t-actions" aria-hidden="true">
+          <span class="t-act">💬 22</span>
+          <span class="t-act">🔁 62</span>
+          <span class="t-act">❤️ 339</span>
+          <span class="t-act">📊 99K</span>
+          <span class="t-act">🔖</span>
+          <span class="t-act highlight" title="In Obsidian speichern">
+            <svg viewBox="0 0 24 24" width="19" height="19"><path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+          </span>
+        </div>
+        <div class="t-note">↑ Der neue Button fügt sich nahtlos neben dem Lesezeichen-Button ein</div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features">
+      <h2>Was die Erweiterung kann</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="emoji">⬇️</div>
+          <h3>Ein Klick genügt</h3>
+          <p>Ein Download-Button im nativen X-Design erscheint direkt neben dem Lesezeichen-Button jedes Beitrags.</p>
+        </div>
+        <div class="card">
+          <div class="emoji">🖼️</div>
+          <h3>Alle Fotos in Originalqualität</h3>
+          <p>Sämtliche Bilder des Beitrags werden in höchster Auflösung geladen – auch Video-Vorschaubilder.</p>
+        </div>
+        <div class="card">
+          <div class="emoji">📁</div>
+          <h3>Fertiges Obsidian-Paket</h3>
+          <p>Pro Artikel ein Ordner: Markdown-Notiz + <code>Bilder</code>-Unterordner. Einfach in den Vault kopieren – fertig.</p>
+        </div>
+        <div class="card">
+          <div class="emoji">🔗</div>
+          <h3>Obsidian-Einbettung inklusive</h3>
+          <p>Bilder sind bereits als Wikilinks <code>![[bild.jpg]]</code> eingebettet und werden im Vault sofort angezeigt.</p>
+        </div>
+        <div class="card">
+          <div class="emoji">🏷️</div>
+          <h3>Frontmatter &amp; Tags</h3>
+          <p>Autor, Quelle, Datum und Tags landen automatisch im YAML-Frontmatter – ideal für Suche und Dataview.</p>
+        </div>
+        <div class="card">
+          <div class="emoji">⚙️</div>
+          <h3>Anpassbar</h3>
+          <p>Basisordner, Bilder-Ordnername, Einbettungsstil und Frontmatter lassen sich frei konfigurieren.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ordnerstruktur -->
+    <section class="structure">
+      <h2>So sieht dein Download aus</h2>
+      <pre class="tree">📁 X to Obsidian/
+   📁 cyrilxbt - 2026-06-10 - Obsidian Masterclass/
+      📄 cyrilxbt - 2026-06-10 - Obsidian Masterclass.md
+      📁 Bilder/
+         🖼️ cyrilxbt - 2026-06-10 - Obsidian Masterclass - 01.jpg
+         🖼️ cyrilxbt - 2026-06-10 - Obsidian Masterclass - 02.jpg</pre>
+    </section>
+
+    <!-- Installation -->
+    <section id="install" class="install">
+      <h2>Installation in 5 Schritten</h2>
+      <ol class="steps">
+        <li>
+          <span class="num">1</span>
+          <div>
+            <h3>ZIP herunterladen &amp; entpacken</h3>
+            <p>Lade die Extension über den Button oben herunter und entpacke die ZIP-Datei in einen Ordner deiner Wahl.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div>
+            <h3>Erweiterungsseite öffnen</h3>
+            <p>Gib <code>chrome://extensions</code> in die Adresszeile von Chrome ein.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div>
+            <h3>Entwicklermodus aktivieren</h3>
+            <p>Schalte oben rechts den <strong>Entwicklermodus</strong> ein.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">4</span>
+          <div>
+            <h3>Entpackte Erweiterung laden</h3>
+            <p>Klicke auf <strong>„Entpackte Erweiterung laden"</strong> und wähle den entpackten Ordner (mit der <code>manifest.json</code>).</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">5</span>
+          <div>
+            <h3>Loslegen</h3>
+            <p>Öffne einen Beitrag auf <code>x.com</code> und klicke auf den neuen Download-Button neben dem Lesezeichen. 🎉</p>
+          </div>
+        </li>
+      </ol>
+      <div class="cta center">
+        <a class="btn primary" href="https://github.com/dailyfundeyt-crypto/X-Article-Extension/archive/refs/heads/main.zip" download>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/></svg>
+          Jetzt herunterladen
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <strong>X to Obsidian</strong> · Open Source ·
+      <a href="https://github.com/dailyfundeyt-crypto/X-Article-Extension" target="_blank" rel="noopener">Quellcode auf GitHub</a>
+    </p>
+    <p class="fine">Nicht mit X Corp. oder Obsidian verbunden.</p>
+  </footer>
+
+</body>
+</html>
