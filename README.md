@@ -13,14 +13,19 @@ liest den Artikel dort.
 
 ## Was die Erweiterung erzeugt
 
+Pro Beitrag genau **eine ZIP-Datei** (nur ein Download):
+
 ```
-📁 X to Obsidian/                                  (Basisordner, frei wählbar)
-   📁 elonmusk - 2026-06-09 - Mein Beitrag/        (ein Ordner pro Artikel)
-      📄 elonmusk - 2026-06-09 - Mein Beitrag.md   (der kopierte Artikel)
-      📁 Bilder/                                    (alle Fotos des Artikels)
-         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 01.jpg
-         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 02.jpg
+📁 X to Obsidian/                                     (Basisordner, frei wählbar)
+   🗜️ elonmusk - 2026-06-09 - Mein Beitrag.zip       (eine ZIP pro Artikel)
+      📁 elonmusk - 2026-06-09 - Mein Beitrag/
+         📄 elonmusk - 2026-06-09 - Mein Beitrag.md   (der kopierte Artikel)
+         📁 Bilder/                                    (alle Fotos des Artikels)
+            🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 01.jpg
+            🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 02.jpg
 ```
+
+ZIP entpacken, den Ordner in den Vault kopieren – fertig.
 
 Im Markdown sind die Bilder als Obsidian-Wikilinks eingebettet
 (`![[… - 01.jpg]]`), sodass sie nach dem Kopieren in den Vault sofort
@@ -46,12 +51,13 @@ Lesezeichen-(Save-)Button – ein Download-Button im nativen X-Design.
 Ein Klick darauf lädt den Beitrag samt Fotos herunter.
 
 **Variante B – über das Popup:**
-Öffne einen Beitrag (Status-Seite), klicke auf das Erweiterungssymbol und dann
-auf **„Aktuellen Beitrag speichern"**.
+Öffne einen Beitrag (Status-Seite) und klicke auf das Erweiterungssymbol. Es
+erscheint ein minimalistisches Popup im Apple-Stil mit genau zwei Knöpfen:
+**Speichern** und **Einstellungen**.
 
-Anschließend findest du den fertigen Ordner in deinem Download-Verzeichnis unter
-dem eingestellten Basisordner. Kopiere diesen Artikel-Ordner in deinen
-Obsidian-Vault – fertig.
+Anschließend findest du die ZIP-Datei in deinem Download-Verzeichnis unter dem
+eingestellten Basisordner. ZIP entpacken und den Artikel-Ordner in deinen
+Obsidian-Vault kopieren – fertig.
 
 ## Einstellungen
 
@@ -80,8 +86,9 @@ Rechtsklick auf das Symbol → **Optionen**, oder im Popup auf
 
 - Manifest V3, kein zusätzliches Obsidian-Plugin nötig.
 - Reine Vanilla-JS-Erweiterung ohne externe Abhängigkeiten.
-- Der Download erfolgt über die `chrome.downloads`-API; Bilder werden im
-  Hintergrund geladen und als Data-URL gespeichert.
+- Markdown + Bilder werden im Service Worker zu einer ZIP-Datei gepackt
+  (eigene minimale ZIP-Implementierung, Store-Methode, UTF-8-Dateinamen) und
+  mit einem einzigen Aufruf der `chrome.downloads`-API gespeichert.
 
 ### Dateien
 

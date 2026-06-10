@@ -9,7 +9,7 @@
   <body>
     <div class="wrap">
       <header>
-        <span class="logo">◈</span>
+        <span class="logo"><img src="../icons/icon48.png" alt="" width="36" height="36" style="border-radius:8px" /></span>
         <div>
           <h1>X to Obsidian</h1>
           <p class="sub">Einstellungen</p>
@@ -22,8 +22,8 @@
           <span class="lbl">Basisordner (im Download-Verzeichnis)</span>
           <input type="text" id="baseFolder" placeholder="X to Obsidian" />
           <small>
-            Jeder Beitrag wird als eigener Unterordner darin gespeichert. Diesen
-            Ordner kopierst du anschließend in deinen Obsidian-Vault.
+            Jeder Beitrag wird als eine einzige ZIP-Datei darin gespeichert.
+            ZIP entpacken und den Ordner in deinen Obsidian-Vault kopieren.
           </small>
         </label>
 
@@ -66,13 +66,14 @@
       </div>
 
       <section class="card preview">
-        <h2>So sieht der Ordner aus</h2>
+        <h2>So sieht der Download aus (eine ZIP-Datei)</h2>
         <pre>📁 <span id="pvBase">X to Obsidian</span>/
-   📁 elonmusk - 2026-06-09 - Mein Beitrag/
-      📄 elonmusk - 2026-06-09 - Mein Beitrag.md
-      📁 <span id="pvImg">Bilder</span>/
-         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 01.jpg
-         🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 02.jpg</pre>
+   🗜️ elonmusk - 2026-06-09 - Mein Beitrag.zip
+      📁 elonmusk - 2026-06-09 - Mein Beitrag/
+         📄 elonmusk - 2026-06-09 - Mein Beitrag.md
+         📁 <span id="pvImg">Bilder</span>/
+            🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 01.jpg
+            🖼️ elonmusk - 2026-06-09 - Mein Beitrag - 02.jpg</pre>
       </section>
     </div>
 

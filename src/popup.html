@@ -2,40 +2,25 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="popup.css" />
     <title>X to Obsidian</title>
   </head>
   <body>
-    <header class="head">
-      <span class="logo">◈</span>
-      <h1>X&nbsp;to&nbsp;Obsidian</h1>
-    </header>
+    <button id="saveCurrent" class="btn save">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+        <path fill="currentColor" d="M12 17.41l-5.7-5.7 1.41-1.42L11 13.59V3h2v10.59l3.29-3.3 1.41 1.42-5.7 5.7zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"/>
+      </svg>
+      Speichern
+    </button>
 
-    <main>
-      <p class="hint">
-        Klicke unter einem Beitrag auf den Download-Button neben dem
-        Lesezeichen-Symbol oder speichere hier den aktuell geöffneten Beitrag.
-      </p>
+    <button id="openOptions" class="btn settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm0 5.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm7.43-1.5c.04-.33.07-.66.07-1s-.03-.67-.07-1l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.73-1l-.38-2.65A.5.5 0 0 0 13.96 1h-4a.5.5 0 0 0-.49.42l-.38 2.65c-.62.26-1.2.6-1.73 1l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64L4.5 10c-.04.33-.07.66-.07 1s.03.67.07 1l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.39.31.61.22l2.49-1c.53.4 1.11.74 1.73 1l.38 2.65c.04.24.25.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65a7.3 7.3 0 0 0 1.73-1l2.49 1c.23.09.49 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.64L19.43 12.5z" transform="translate(0 .5)"/>
+      </svg>
+      Einstellungen
+    </button>
 
-      <button id="saveCurrent" class="btn primary">Aktuellen Beitrag speichern</button>
-      <div id="status" class="status" hidden></div>
-
-      <section class="info">
-        <div class="row">
-          <span class="label">Zielordner</span>
-          <span id="folderInfo" class="value">…</span>
-        </div>
-        <div class="row">
-          <span class="label">Bilder-Unterordner</span>
-          <span id="imgInfo" class="value">…</span>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <button id="openOptions" class="btn link">Einstellungen öffnen</button>
-    </footer>
+    <div id="status" class="status" hidden></div>
 
     <script src="popup.js"></script>
   </body>

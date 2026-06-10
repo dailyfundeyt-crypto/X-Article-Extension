@@ -1,13 +1,15 @@
 /*
  * X to Obsidian – Background Service Worker
  *
- * Lädt einen X-Beitrag als fertiges Obsidian-"Paket" herunter:
+ * Packt einen X-Beitrag als EINE ZIP-Datei (nur ein Download):
  *
- *   <Basisordner>/<Artikel-Ordner>/<Artikel>.md
- *   <Basisordner>/<Artikel-Ordner>/<Bilder-Unterordner>/<bild-1.jpg> ...
+ *   <Basisordner>/<Artikel>.zip
+ *      └─ <Artikel>/
+ *         ├─ <Artikel>.md
+ *         └─ <Bilder-Unterordner>/<bild-01.jpg> …
  *
- * Im Markdown werden die Bilder wie in Obsidian eingebettet (![[bild-1.jpg]]),
- * sodass der komplette Ordner einfach in den Vault kopiert werden kann.
+ * Im Markdown sind die Bilder wie in Obsidian eingebettet (![[bild-01.jpg]]).
+ * ZIP entpacken, Ordner in den Vault kopieren – fertig.
  */
 
 const DEFAULTS = {
@@ -50,8 +52,7 @@ function slugifyTitle(text, max = 60) {
 
 function formatDateParts(iso) {
   const d = iso ? new Date(iso) : new Date();
-  const valid = !isNaN(d.getTime());
-  const dd = valid ? d : new Date();
+  const dd = isNaN(d.getTime()) ? new Date() : d;
   const pad = (n) => String(n).padStart(2, "0");
   return `${dd.getFullYear()}-${pad(dd.getMonth() + 1)}-${pad(dd.getDate())}`;
 }
@@ -63,11 +64,6 @@ function buildArticleFolderName(tweet) {
   const parts = [handle, date];
   if (title) parts.push(title);
   return sanitizePathSegment(parts.join(" - "));
-}
-
-function buildNoteName(tweet, folderName) {
-  // Notiz-Dateiname identisch zum Ordnernamen für einfache Lesbarkeit
-  return sanitizePathSegment(folderName);
 }
 
 function extFromUrlOrType(url, contentType) {
@@ -86,25 +82,116 @@ function extFromUrlOrType(url, contentType) {
       "image/gif": "gif",
       "image/webp": "webp",
     };
-    if (map[contentType.split(";")[0].trim()]) return map[contentType.split(";")[0].trim()];
+    const key = contentType.split(";")[0].trim();
+    if (map[key]) return map[key];
   }
   return "jpg";
 }
 
-function arrayBufferToDataUrl(buf, mime) {
-  const bytes = new Uint8Array(buf);
+function bytesToBase64(bytes) {
   let binary = "";
   const chunk = 0x8000;
   for (let i = 0; i < bytes.length; i += chunk) {
     binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
   }
-  return `data:${mime || "application/octet-stream"};base64,${btoa(binary)}`;
+  return btoa(binary);
 }
 
-function textToDataUrl(text) {
-  // UTF-8-sichere Kodierung
-  const utf8 = new TextEncoder().encode(text);
-  return arrayBufferToDataUrl(utf8.buffer, "text/markdown;charset=utf-8");
+/* ----------------------------------------------------------------- ZIP */
+/* Minimale ZIP-Implementierung (Store-Methode, UTF-8-Dateinamen). */
+
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(data) {
+  let c = 0xffffffff;
+  for (let i = 0; i < data.length; i++) {
+    c = CRC_TABLE[(c ^ data[i]) & 0xff] ^ (c >>> 8);
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function dosDateTime(d = new Date()) {
+  const time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  const date =
+    (((d.getFullYear() - 1980) & 0x7f) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  return { time, date };
+}
+
+// entries: [{ name: "pfad/datei.ext", data: Uint8Array }]
+function buildZip(entries) {
+  const encoder = new TextEncoder();
+  const { time, date } = dosDateTime();
+  const parts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  for (const e of entries) {
+    const nameBytes = encoder.encode(e.name);
+    const data = e.data;
+    const crc = crc32(data);
+
+    const local = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true); // local file header
+    lv.setUint16(4, 20, true); // version needed
+    lv.setUint16(6, 0x0800, true); // flags: UTF-8
+    lv.setUint16(8, 0, true); // method: store
+    lv.setUint16(10, time, true);
+    lv.setUint16(12, date, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, data.length, true);
+    lv.setUint32(22, data.length, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+    parts.push(local, data);
+
+    const central = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(central.buffer);
+    cv.setUint32(0, 0x02014b50, true); // central directory header
+    cv.setUint16(4, 20, true); // version made by
+    cv.setUint16(6, 20, true); // version needed
+    cv.setUint16(8, 0x0800, true); // flags: UTF-8
+    cv.setUint16(10, 0, true); // method: store
+    cv.setUint16(12, time, true);
+    cv.setUint16(14, date, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, data.length, true);
+    cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint32(42, offset, true); // local header offset
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+
+    offset += local.length + data.length;
+  }
+
+  const centralSize = centralParts.reduce((s, p) => s + p.length, 0);
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); // end of central directory
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, centralSize, true);
+  ev.setUint32(16, offset, true);
+
+  const all = [...parts, ...centralParts, eocd];
+  const total = all.reduce((s, p) => s + p.length, 0);
+  const out = new Uint8Array(total);
+  let pos = 0;
+  for (const p of all) {
+    out.set(p, pos);
+    pos += p.length;
+  }
+  return out;
 }
 
 /* --------------------------------------------------------------- Downloads */
@@ -123,9 +210,7 @@ async function fetchImage(url) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const contentType = res.headers.get("content-type") || "";
   const buf = await res.arrayBuffer();
-  const ext = extFromUrlOrType(url, contentType);
-  const mime = contentType.split(";")[0].trim() || `image/${ext === "jpg" ? "jpeg" : ext}`;
-  return { dataUrl: arrayBufferToDataUrl(buf, mime), ext };
+  return { bytes: new Uint8Array(buf), ext: extFromUrlOrType(url, contentType) };
 }
 
 /* --------------------------------------------------------------- Markdown */
@@ -180,46 +265,49 @@ async function saveTweet(tweet) {
   const settings = await getSettings();
 
   const folderName = buildArticleFolderName(tweet);
-  const noteName = buildNoteName(tweet, folderName);
+  const noteName = folderName;
   const base = sanitizePathSegment(settings.baseFolder) || "X to Obsidian";
   const imgDir = sanitize(settings.imagesSubfolder) || "Bilder";
 
-  const articlePath = `${base}/${folderName}`;
-
-  // 1) Bilder laden und herunterladen
+  // 1) Bilder laden
+  const imageEntries = [];
   const imageFiles = [];
   let failed = 0;
   for (let i = 0; i < tweet.images.length; i++) {
-    const url = tweet.images[i];
     try {
-      const { dataUrl, ext } = await fetchImage(url);
+      const { bytes, ext } = await fetchImage(tweet.images[i]);
       const filename = `${noteName} - ${String(i + 1).padStart(2, "0")}.${ext}`;
-      await download({
-        url: dataUrl,
-        filename: `${articlePath}/${imgDir}/${filename}`,
-        conflictAction: "uniquify",
-        saveAs: false,
-      });
+      imageEntries.push({ name: `${folderName}/${imgDir}/${filename}`, data: bytes });
       imageFiles.push(filename);
     } catch (e) {
       failed++;
-      console.warn("Bild konnte nicht geladen werden:", url, e);
+      console.warn("Bild konnte nicht geladen werden:", tweet.images[i], e);
     }
   }
 
-  // 2) Markdown erstellen und herunterladen
+  // 2) Markdown erstellen
   const markdown = buildMarkdown(tweet, settings, imageFiles);
+  const mdEntry = {
+    name: `${folderName}/${noteName}.md`,
+    data: new TextEncoder().encode(markdown),
+  };
+
+  // 3) Alles in EINE ZIP-Datei packen und einmal herunterladen
+  const zipBytes = buildZip([mdEntry, ...imageEntries]);
+  const dataUrl = `data:application/zip;base64,${bytesToBase64(zipBytes)}`;
   await download({
-    url: textToDataUrl(markdown),
-    filename: `${articlePath}/${noteName}.md`,
+    url: dataUrl,
+    filename: `${base}/${folderName}.zip`,
     conflictAction: "uniquify",
     saveAs: false,
   });
 
-  let message = `Gespeichert: „${folderName}"`;
-  if (imageFiles.length) message += ` (${imageFiles.length} Bild${imageFiles.length === 1 ? "" : "er"})`;
+  let message = `Gespeichert: „${folderName}.zip"`;
+  if (imageFiles.length) {
+    message += ` (${imageFiles.length} Bild${imageFiles.length === 1 ? "" : "er"})`;
+  }
   if (failed) message += ` – ${failed} Bild(er) fehlgeschlagen`;
-  return { ok: true, message, folder: articlePath, images: imageFiles.length, failed };
+  return { ok: true, message, zip: `${base}/${folderName}.zip`, images: imageFiles.length, failed };
 }
 
 /* --------------------------------------------------------------- Messaging */

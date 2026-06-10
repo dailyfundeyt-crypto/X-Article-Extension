@@ -6,7 +6,7 @@
   --muted: #71767b;
   --x-blue: #1d9bf0;
   --x-blue-dark: #1a8cd8;
-  --accent: #7c3aed;
+  --accent: #f5f5f7;
   --green: #00ba7c;
 }
 
@@ -84,13 +84,13 @@ code {
   transform: translateX(-50%);
   width: 720px;
   height: 480px;
-  background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.28), rgba(29, 155, 240, 0.12) 55%, transparent 75%);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04) 55%, transparent 75%);
   pointer-events: none;
 }
 
 .hero-icon {
   border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 8px 40px rgba(255, 255, 255, 0.18);
   margin-bottom: 28px;
 }
 
@@ -105,7 +105,7 @@ code {
 .x-mark { font-weight: 900; }
 
 .grad {
-  background: linear-gradient(120deg, #a78bfa, #7c3aed);
+  background: linear-gradient(120deg, #ffffff, #8e8e93);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -141,8 +141,8 @@ code {
 .btn:hover { text-decoration: none; }
 .btn:active { transform: scale(0.97); }
 
-.btn.primary { background: var(--x-blue); color: #fff; }
-.btn.primary:hover { background: var(--x-blue-dark); }
+.btn.primary { background: #f5f5f7; color: #000; }
+.btn.primary:hover { background: #d6d6db; }
 
 .btn.ghost {
   border: 1px solid var(--border);
@@ -171,7 +171,7 @@ code {
 .avatar {
   width: 44px; height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  background: linear-gradient(135deg, #3a3a3c, #1c1c1e);
   flex-shrink: 0;
 }
 
@@ -301,8 +301,8 @@ main h2 {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--x-blue);
-  color: #fff;
+  background: #f5f5f7;
+  color: #000;
   font-weight: 800;
   font-size: 15px;
 }
