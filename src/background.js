@@ -226,6 +226,58 @@ function download(options) {
   });
 }
 
+async function ensureOffscreenDocument() {
+  if (!chrome.offscreen) return false;
+  try {
+    if (!(await chrome.offscreen.hasDocument())) {
+      await chrome.offscreen.createDocument({
+        url: "src/offscreen.html",
+        reasons: ["BLOBS"],
+        justification:
+          "ZIP-Datei als Blob-URL bereitstellen, damit große Downloads zuverlässig funktionieren",
+      });
+    }
+    return true;
+  } catch (e) {
+    console.warn("Offscreen-Dokument nicht verfügbar:", e);
+    return false;
+  }
+}
+
+// Lädt die ZIP herunter – bevorzugt über eine Blob-URL (Offscreen-Dokument,
+// robust bei großen Dateien), mit Data-URL als Fallback.
+async function downloadZip(zipBytes, filename) {
+  const base64 = bytesToBase64(zipBytes);
+
+  try {
+    if (await ensureOffscreenDocument()) {
+      const res = await chrome.runtime.sendMessage({
+        type: "X2OBS_CREATE_BLOB_URL",
+        base64,
+        mime: "application/zip",
+      });
+      if (res && res.ok && res.url) {
+        await download({
+          url: res.url,
+          filename,
+          conflictAction: "uniquify",
+          saveAs: false,
+        });
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn("Blob-Download fehlgeschlagen, nutze Data-URL:", e);
+  }
+
+  await download({
+    url: `data:application/zip;base64,${base64}`,
+    filename,
+    conflictAction: "uniquify",
+    saveAs: false,
+  });
+}
+
 async function fetchImage(url) {
   const res = await fetch(url, { credentials: "omit" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -386,13 +438,7 @@ async function saveTweet(tweet) {
 
   // 3) Alles in EINE ZIP-Datei packen und einmal herunterladen
   const zipBytes = buildZip([mdEntry, ...imageEntries]);
-  const dataUrl = `data:application/zip;base64,${bytesToBase64(zipBytes)}`;
-  await download({
-    url: dataUrl,
-    filename: `${base}/${folderName}.zip`,
-    conflictAction: "uniquify",
-    saveAs: false,
-  });
+  await downloadZip(zipBytes, `${base}/${folderName}.zip`);
 
   let message = `Gespeichert: „${folderName}.zip"`;
   if (imageFiles.length) {

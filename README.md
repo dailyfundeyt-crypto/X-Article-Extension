@@ -91,6 +91,23 @@ Wenn aktiviert, passiert nach jedem Speichern automatisch Folgendes:
 Falls das automatische Kopieren blockiert wird, zeigt die Erweiterung ein
 kleines Glas-Overlay mit dem Prompt und einem Kopieren-Knopf.
 
+## Update & Fehlerbehebung
+
+**Wichtig:** Nach jeder Code-Änderung muss die Erweiterung neu geladen werden,
+sonst läuft die alte Version weiter:
+
+1. Neueste Version herunterladen (richtigen Branch wählen!) und entpacken.
+2. `chrome://extensions` öffnen.
+3. Die alte Version von XCapture **entfernen**.
+4. **„Entpackte Erweiterung laden"** und den neuen Ordner wählen –
+   oder, wenn derselbe Ordner aktualisiert wurde, auf das
+   **Neu-laden-Symbol (↻)** auf der Erweiterungskarte klicken.
+
+**Symptom: Bilder werden einzeln heruntergeladen / keine MD-Datei.**
+Das ist das Verhalten der allerersten Version. Seit Version 1.1 wird alles
+(Markdown + alle Bilder) in **eine einzige ZIP-Datei** gepackt – ein Download.
+Bitte wie oben beschrieben auf die neueste Version aktualisieren.
+
 ## Hinweise
 
 - Fotos werden in höchster verfügbarer Auflösung geladen (`name=orig`).
