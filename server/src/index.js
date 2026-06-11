@@ -26,7 +26,14 @@ import {
   listFolders,
   createLinkCode,
 } from "./db.js";
-import { aiConfigFor, chatCompletion, generatePlan, categorizeArticle, AI_PROVIDERS } from "./ai.js";
+import {
+  aiConfigFor,
+  chatCompletion,
+  generatePlan,
+  categorizeArticle,
+  chatAboutArticles,
+  AI_PROVIDERS,
+} from "./ai.js";
 import { startTelegramBot, notifyNewArticle, telegramEnabled } from "./telegram.js";
 
 const PORT = Number(process.env.PORT || 8787);
@@ -191,6 +198,34 @@ app.post("/api/ai/forward", auth, async (req, res) => {
   if (model) cfg.model = model;
   try {
     const answer = await chatCompletion(cfg, [{ role: "user", content: prompt }]);
+    res.json({ answer });
+  } catch (e) {
+    res.status(502).json({ error: e.message });
+  }
+});
+
+// Chat über die gespeicherten Artikel (wie der Telegram-Agent, für das
+// Side Panel der Extension)
+app.post("/api/ai/chat", auth, async (req, res) => {
+  const question = (req.body?.question || "").trim();
+  if (!question) return res.status(400).json({ error: "Frage fehlt" });
+  const settings = getSettings(req.userId);
+  const cfg = aiConfigFor(settings);
+  if (!cfg.apiKey)
+    return res.status(400).json({
+      error: "Kein AI-Schlüssel im Konto – in den Einstellungen 'Schlüssel im Konto speichern' aktivieren.",
+    });
+
+  // Kontext: passende + neueste Artikel
+  const matches = listArticles(req.userId, { q: question.slice(0, 60), limit: 5 });
+  const recent = listArticles(req.userId, { limit: 5 });
+  const seen = new Set();
+  const context = [...matches, ...recent]
+    .filter((a) => !seen.has(a.id) && seen.add(a.id))
+    .slice(0, 8)
+    .map((a) => getArticle(req.userId, a.id));
+  try {
+    const answer = await chatAboutArticles(cfg, question, context);
     res.json({ answer });
   } catch (e) {
     res.status(502).json({ error: e.message });

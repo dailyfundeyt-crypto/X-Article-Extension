@@ -91,6 +91,16 @@ Wenn aktiviert, passiert nach jedem Speichern automatisch Folgendes:
 Falls das automatische Kopieren blockiert wird, zeigt die Erweiterung ein
 kleines Glas-Overlay mit dem Prompt und einem Kopieren-Knopf.
 
+## AI-Chat in der Seitenleiste
+
+Über das Popup (**AI-Chat**) öffnet sich der XCapture-Assistent als
+**Side Panel** neben der Webseite:
+
+- **Allgemein:** direkter AI-Chat (dein API-Schlüssel aus „KI & Comet");
+  mit **+** hängst du den X-Artikel der aktuellen Seite als Kontext an.
+- **Meine Savings:** Chat über deine im Konto gespeicherten Artikel –
+  wie der Telegram-Agent, nur direkt im Browser (Anmeldung erforderlich).
+
 ## Konto, AI-Aktionen & Telegram-Agent (optional)
 
 Mit dem [XCapture-Server](server/) wird aus der Extension ein komplettes

@@ -59,3 +59,8 @@ async function saveCurrent() {
 
 $("saveCurrent").addEventListener("click", saveCurrent);
 $("openOptions").addEventListener("click", () => chrome.runtime.openOptionsPage());
+$("openChat").addEventListener("click", async () => {
+  const win = await chrome.windows.getCurrent();
+  await chrome.sidePanel.open({ windowId: win.id });
+  window.close();
+});
