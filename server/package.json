@@ -1,0 +1,19 @@
+{
+  "name": "xcapture-server",
+  "version": "1.0.0",
+  "description": "XCapture Backend – Konten, Settings-Sync, Artikel-Speicher, AI-Aktionen und Telegram-Agent",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

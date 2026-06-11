@@ -21,6 +21,9 @@ const DEFAULTS = {
   aiEnabled: false,
   aiProvider: "openai", // "openai" | "perplexity" | "openrouter"
   aiModel: "",
+  obsidianDirect: false,
+  obsidianUrl: "http://127.0.0.1:27123",
+  businessContext: "",
 };
 
 // OpenAI-kompatible Chat-Completions-Endpunkte
@@ -43,8 +46,13 @@ const AI_PROVIDERS = {
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get(DEFAULTS);
-  // API-Schlüssel bewusst nur lokal (nicht synchronisiert)
-  const local = await chrome.storage.local.get({ aiApiKey: "" });
+  // Schlüssel & Konto-Token bewusst nur lokal (nicht synchronisiert)
+  const local = await chrome.storage.local.get({
+    aiApiKey: "",
+    obsidianKey: "",
+    serverUrl: "",
+    serverToken: "",
+  });
   return { ...DEFAULTS, ...stored, ...local };
 }
 
@@ -331,6 +339,67 @@ function buildMarkdown(tweet, settings, imageFiles) {
   return lines.join("\n");
 }
 
+/* ----------------------------------------------------- Obsidian Direkt */
+
+function vaultPath(...segments) {
+  return segments
+    .flatMap((s) => String(s).split("/"))
+    .filter(Boolean)
+    .map(encodeURIComponent)
+    .join("/");
+}
+
+// Schreibt Markdown + Bilder direkt in den Vault – über das Obsidian-Plugin
+// „Local REST API" (PUT /vault/<pfad>).
+async function saveToObsidianVault(settings, base, folderName, noteName, markdown, images, imgDir) {
+  const root = settings.obsidianUrl.replace(/\/+$/, "");
+  const put = async (path, body, type) => {
+    const res = await fetch(`${root}/vault/${path}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${settings.obsidianKey}`,
+        "Content-Type": type,
+      },
+      body,
+    });
+    if (!res.ok) throw new Error(`Obsidian REST ${res.status}`);
+  };
+  await put(vaultPath(base, folderName, `${noteName}.md`), markdown, "text/markdown");
+  for (const img of images) {
+    await put(
+      vaultPath(base, folderName, imgDir, img.filename),
+      img.bytes,
+      "application/octet-stream"
+    );
+  }
+}
+
+/* ----------------------------------------------------------- Konto-Sync */
+
+// Lädt den Artikel ins XCapture-Konto hoch (Server legt ihn per AI in einen
+// Ordner und benachrichtigt den Telegram-Agenten).
+async function uploadArticleToAccount(settings, tweet, title, markdown) {
+  if (!settings.serverUrl || !settings.serverToken) return null;
+  const res = await fetch(`${settings.serverUrl.replace(/\/+$/, "")}/api/articles`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${settings.serverToken}`,
+    },
+    body: JSON.stringify({
+      title,
+      author: tweet.authorName,
+      handle: tweet.authorHandle,
+      url: tweet.url,
+      text: tweet.text,
+      images: tweet.images,
+      markdown,
+    }),
+  });
+  if (!res.ok) throw new Error(`Server ${res.status}`);
+  return res.json();
+}
+
 /* ------------------------------------------------------------- AI / Comet */
 
 async function generateActionList(tweet, settings) {
@@ -414,14 +483,14 @@ async function saveTweet(tweet) {
   const imgDir = sanitize(settings.imagesSubfolder) || "Bilder";
 
   // 1) Bilder laden
-  const imageEntries = [];
+  const images = [];
   const imageFiles = [];
   let failed = 0;
   for (let i = 0; i < tweet.images.length; i++) {
     try {
       const { bytes, ext } = await fetchImage(tweet.images[i]);
       const filename = `${noteName} - ${String(i + 1).padStart(2, "0")}.${ext}`;
-      imageEntries.push({ name: `${folderName}/${imgDir}/${filename}`, data: bytes });
+      images.push({ filename, bytes });
       imageFiles.push(filename);
     } catch (e) {
       failed++;
@@ -431,20 +500,46 @@ async function saveTweet(tweet) {
 
   // 2) Markdown erstellen
   const markdown = buildMarkdown(tweet, settings, imageFiles);
-  const mdEntry = {
-    name: `${folderName}/${noteName}.md`,
-    data: new TextEncoder().encode(markdown),
-  };
 
-  // 3) Alles in EINE ZIP-Datei packen und einmal herunterladen
-  const zipBytes = buildZip([mdEntry, ...imageEntries]);
-  await downloadZip(zipBytes, `${base}/${folderName}.zip`);
+  // 3) Direkt in den Obsidian-Vault schreiben – oder ZIP als Fallback
+  let savedDirect = false;
+  if (settings.obsidianDirect && settings.obsidianKey) {
+    try {
+      await saveToObsidianVault(settings, base, folderName, noteName, markdown, images, imgDir);
+      savedDirect = true;
+    } catch (e) {
+      console.warn("Direkt-Speichern fehlgeschlagen, nutze ZIP:", e);
+    }
+  }
+  if (!savedDirect) {
+    const mdEntry = {
+      name: `${folderName}/${noteName}.md`,
+      data: new TextEncoder().encode(markdown),
+    };
+    const imageEntries = images.map((img) => ({
+      name: `${folderName}/${imgDir}/${img.filename}`,
+      data: img.bytes,
+    }));
+    const zipBytes = buildZip([mdEntry, ...imageEntries]);
+    await downloadZip(zipBytes, `${base}/${folderName}.zip`);
+  }
 
-  let message = `Gespeichert: „${folderName}.zip"`;
+  let message = savedDirect
+    ? `Direkt in Obsidian gespeichert: „${folderName}"`
+    : `Gespeichert: „${folderName}.zip"`;
   if (imageFiles.length) {
     message += ` (${imageFiles.length} Bild${imageFiles.length === 1 ? "" : "er"})`;
   }
   if (failed) message += ` – ${failed} Bild(er) fehlgeschlagen`;
+
+  // 3b) Artikel ins Konto hochladen (Telegram-Agent + AI-Ordner-Ablage)
+  try {
+    const up = await uploadArticleToAccount(settings, tweet, folderName, markdown);
+    if (up && up.ok) message += ` · Konto ✓ (${up.folder})`;
+  } catch (e) {
+    console.warn("Konto-Upload fehlgeschlagen:", e);
+    message += " · Konto-Sync fehlgeschlagen";
+  }
 
   // 4) Optional: AI-Aktionsliste erzeugen und als Comet-Prompt mitliefern
   let cometPrompt = null;

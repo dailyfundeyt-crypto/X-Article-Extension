@@ -62,6 +62,77 @@
       </section>
 
       <section class="card">
+        <h2>Konto &amp; Telegram</h2>
+        <label>
+          <span class="lbl">Server-URL</span>
+          <input type="text" id="serverUrl" placeholder="http://localhost:8787" />
+          <small>Adresse deines XCapture-Servers (siehe <code>server/</code> im Repo).</small>
+        </label>
+
+        <div id="accLoggedOut">
+          <label>
+            <span class="lbl">E-Mail</span>
+            <input type="email" id="accEmail" autocomplete="email" />
+          </label>
+          <label>
+            <span class="lbl">Passwort</span>
+            <input type="password" id="accPassword" placeholder="min. 8 Zeichen" autocomplete="current-password" />
+          </label>
+          <div class="btnrow">
+            <button id="accLogin" class="btn primary" type="button">Anmelden</button>
+            <button id="accRegister" class="btn ghost" type="button">Registrieren</button>
+          </div>
+          <small>Dieselben Zugangsdaten wie auf der Konto-Seite – deine Einstellungen folgen deinem Konto.</small>
+        </div>
+
+        <div id="accLoggedIn" hidden>
+          <p class="acc-who">Angemeldet als <strong id="accWho"></strong></p>
+          <label class="check">
+            <input type="checkbox" id="syncEnabled" />
+            <span>Einstellungen mit dem Konto synchronisieren</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="shareAiKey" />
+            <span>AI-Schlüssel im Konto speichern (für Telegram-Agent &amp; Server-AI)</span>
+          </label>
+          <label>
+            <span class="lbl">Unternehmens-/Kontext für Pläne</span>
+            <input type="text" id="businessContext" placeholder="z. B. SaaS-Startup für Buchhaltung" />
+            <small>Wird genutzt, wenn die AI Artikel auf dein Unternehmen anwendet oder Pläne erstellt.</small>
+          </label>
+          <div class="btnrow">
+            <button id="tgCodeBtn" class="btn ghost" type="button">Telegram-Code erzeugen</button>
+            <button id="accLogout" class="btn ghost" type="button">Abmelden</button>
+          </div>
+          <div id="tgCodeOut" class="codeout" hidden></div>
+          <small id="tgHint" hidden>Sende dem Bot in Telegram: <strong>/code &lt;Zahl&gt;</strong> (10 Minuten gültig)</small>
+        </div>
+        <div id="accStatus" class="acc-status"></div>
+      </section>
+
+      <section class="card">
+        <h2>Obsidian Direkt-Speichern</h2>
+        <label class="check">
+          <input type="checkbox" id="obsidianDirect" />
+          <span>Artikel direkt in den Vault schreiben (statt ZIP-Download)</span>
+        </label>
+        <small class="block-note">
+          Benötigt das Obsidian-Community-Plugin „Local REST API". Aktiviere es
+          in Obsidian und trage hier URL und API-Schlüssel ein. Schlägt das
+          direkte Speichern fehl, lädt XCapture automatisch die ZIP herunter.
+        </small>
+        <label>
+          <span class="lbl">REST-URL</span>
+          <input type="text" id="obsidianUrl" placeholder="http://127.0.0.1:27123" />
+        </label>
+        <label>
+          <span class="lbl">API-Schlüssel</span>
+          <input type="password" id="obsidianKey" autocomplete="off" />
+          <small>Wird nur lokal gespeichert.</small>
+        </label>
+      </section>
+
+      <section class="card">
         <h2>KI &amp; Comet</h2>
         <label class="check">
           <input type="checkbox" id="aiEnabled" />

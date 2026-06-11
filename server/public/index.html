@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XCapture – Konto</title>
+  <style>
+    :root {
+      --text: #f5f5f7; --muted: #98989d;
+      --glass: rgba(255,255,255,0.05); --glass-border: rgba(255,255,255,0.12);
+      --ok: #30d158; --err: #ff453a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      color: var(--text); -webkit-font-smoothing: antialiased;
+      background:
+        radial-gradient(80% 50% at 50% 0%, rgba(255,255,255,0.07), transparent 65%),
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        #0a0a0c;
+      background-size: auto, 44px 44px, 44px 44px, auto;
+      padding: 56px 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .brand h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+    .stone { font-size: 26px; }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; text-align: center; }
+    .card {
+      width: min(380px, 94vw);
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 22px; padding: 26px;
+      backdrop-filter: blur(24px) saturate(150%);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    input {
+      width: 100%; padding: 11px 13px; font-size: 14px; font-family: inherit;
+      background: rgba(0,0,0,0.35); border: 1px solid var(--glass-border);
+      border-radius: 11px; color: var(--text);
+    }
+    input:focus { outline: none; border-color: rgba(255,255,255,0.35); }
+    button {
+      width: 100%; padding: 12px; font-size: 14px; font-weight: 600; font-family: inherit;
+      border: none; border-radius: 980px; cursor: pointer;
+      transition: opacity .15s ease, transform .1s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    button:active { transform: scale(.97); }
+    .primary { background: rgba(245,245,247,0.94); color: #000; }
+    .primary:hover { background: #fff; }
+    .ghost { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--glass-border); }
+    .ghost:hover { background: rgba(255,255,255,0.12); }
+    .status { font-size: 12.5px; text-align: center; min-height: 18px; }
+    .status.ok { color: var(--ok); } .status.err { color: var(--err); }
+    .hint { font-size: 12px; color: var(--muted); line-height: 1.6; text-align: center; }
+    .code {
+      font-family: ui-monospace, Menlo, monospace; font-size: 26px; font-weight: 700;
+      letter-spacing: 6px; text-align: center; padding: 8px 0;
+    }
+    .row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; }
+    .row span:first-child { color: var(--muted); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="brand"><span class="stone">🪨</span><h1>XCapture</h1></div>
+  <p class="sub">Ein Konto für Landing Page, Extension und Telegram-Agent.</p>
+
+  <!-- Anmeldung -->
+  <div class="card" id="authCard">
+    <input type="email" id="email" placeholder="E-Mail" autocomplete="email" />
+    <input type="password" id="password" placeholder="Passwort (min. 8 Zeichen)" autocomplete="current-password" />
+    <button class="primary" id="loginBtn">Anmelden</button>
+    <button class="ghost" id="registerBtn">Neues Konto erstellen</button>
+    <div class="status" id="authStatus"></div>
+    <p class="hint">Mit denselben Zugangsdaten meldest du dich in den Einstellungen der XCapture-Extension an – deine Personalisierung folgt deinem Konto.</p>
+  </div>
+
+  <!-- Konto-Bereich -->
+  <div class="card" id="accountCard" hidden>
+    <div class="row"><span>Angemeldet als</span><span id="meEmail">…</span></div>
+    <div class="row"><span>Telegram-Agent</span><span id="tgState">…</span></div>
+    <button class="primary" id="tgCodeBtn">Telegram-Verknüpfungscode erzeugen</button>
+    <div class="code" id="tgCode" hidden></div>
+    <p class="hint" id="tgHint" hidden>Sende dem Bot in Telegram: <b>/code &lt;Zahl&gt;</b> (10 Minuten gültig)</p>
+    <button class="ghost" id="logoutBtn">Abmelden</button>
+    <div class="status" id="accStatus"></div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const api = (path, opts = {}) =>
+      fetch(path, {
+        ...opts,
+        headers: {
+          "Content-Type": "application/json",
+          ...(localStorage.xcToken ? { Authorization: "Bearer " + localStorage.xcToken } : {}),
+          ...(opts.headers || {}),
+        },
+      }).then(async (r) => {
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.error || ("HTTP " + r.status));
+        return data;
+      });
+
+    function setStatus(el, msg, ok) {
+      el.textContent = msg; el.className = "status " + (ok ? "ok" : "err");
+    }
+
+    async function refresh() {
+      if (!localStorage.xcToken) { $("authCard").hidden = false; $("accountCard").hidden = true; return; }
+      try {
+        const me = await api("/api/auth/me");
+        $("meEmail").textContent = me.email;
+        $("tgState").textContent = me.telegram ? "verfügbar" : "auf dem Server nicht konfiguriert";
+        $("tgCodeBtn").disabled = !me.telegram;
+        $("authCard").hidden = true; $("accountCard").hidden = false;
+      } catch {
+        localStorage.removeItem("xcToken"); refresh();
+      }
+    }
+
+    async function authAction(path) {
+      try {
+        const data = await api(path, {
+          method: "POST",
+          body: JSON.stringify({ email: $("email").value.trim(), password: $("password").value }),
+        });
+        localStorage.xcToken = data.token;
+        refresh();
+      } catch (e) { setStatus($("authStatus"), e.message, false); }
+    }
+
+    $("loginBtn").onclick = () => authAction("/api/auth/login");
+    $("registerBtn").onclick = () => authAction("/api/auth/register");
+    $("logoutBtn").onclick = () => { localStorage.removeItem("xcToken"); refresh(); };
+    $("tgCodeBtn").onclick = async () => {
+      try {
+        const d = await api("/api/telegram/link-code", { method: "POST" });
+        $("tgCode").textContent = d.code; $("tgCode").hidden = false; $("tgHint").hidden = false;
+      } catch (e) { setStatus($("accStatus"), e.message, false); }
+    };
+
+    refresh();
+  </script>
+</body>
+</html>

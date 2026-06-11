@@ -40,7 +40,14 @@
     "https://*.twimg.com/*",
     "https://api.openai.com/*",
     "https://api.perplexity.ai/*",
-    "https://openrouter.ai/*"
+    "https://openrouter.ai/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://127.0.0.1/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ],
   "content_scripts": [
     {

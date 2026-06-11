@@ -91,6 +91,36 @@ Wenn aktiviert, passiert nach jedem Speichern automatisch Folgendes:
 Falls das automatische Kopieren blockiert wird, zeigt die Erweiterung ein
 kleines Glas-Overlay mit dem Prompt und einem Kopieren-Knopf.
 
+## Konto, AI-Aktionen & Telegram-Agent (optional)
+
+Mit dem [XCapture-Server](server/) wird aus der Extension ein komplettes
+System – ein Konto für alles:
+
+- **Anmelden:** Auf der Konto-Seite des Servers registrieren und mit
+  **denselben Zugangsdaten** in den Extension-Einstellungen anmelden.
+  Einstellungen und Personalisierungen folgen dem Konto (Sync).
+- **Artikel im Konto:** Jeder gespeicherte Beitrag wird zusätzlich ins Konto
+  hochgeladen und per **AI automatisch in passende Ordner** einsortiert.
+- **AI-Aktionen:** Umsetzungsplan zu einem Artikel – auf Wunsch direkt auf
+  **dein Unternehmen** angewendet (Kontext-Feld in den Einstellungen) – oder
+  Prompt-Weiterleitung an andere KI-Agenten (per API-Schlüssel).
+- **Telegram-Agent:** Bot verknüpfen (6-stelliger Code aus den Einstellungen),
+  dann: Benachrichtigung bei neuen Artikeln, `/list`, `/folders`,
+  `/search <Begriff>`, `/plan <Nr>` – und freier Chat über deine Savings.
+
+Setup: siehe [`server/README.md`](server/README.md).
+
+## Obsidian Direkt-Speichern (optional)
+
+Statt der ZIP kann XCapture Artikel **direkt in deinen Vault schreiben**:
+
+1. In Obsidian das Community-Plugin **„Local REST API"** installieren und
+   aktivieren.
+2. In den XCapture-Einstellungen „Obsidian Direkt-Speichern" aktivieren und
+   URL (Standard `http://127.0.0.1:27123`) + API-Schlüssel eintragen.
+3. Beim Speichern landet der Artikel sofort als Notiz samt Bildern im Vault.
+   Schlägt das fehl (z. B. Obsidian geschlossen), gibt es automatisch die ZIP.
+
 ## Update & Fehlerbehebung
 
 **Wichtig:** Nach jeder Code-Änderung muss die Erweiterung neu geladen werden,
